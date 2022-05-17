@@ -27,7 +27,6 @@ class _RecordState extends State<Record> {
     recordFilePath = await getFilePath();
     RecordMp3.instance.start(recordFilePath!, (type) {
       statusText = "Record error--->$type";
-      setState(() {});
     });
   }
 
@@ -36,7 +35,6 @@ class _RecordState extends State<Record> {
       statusText = "Record Saved in $recordFilePath";
       RecordMp3.instance.stop();
       _status = RecordStatus.IDEL;
-      setState(() {});
     }
   }
 
