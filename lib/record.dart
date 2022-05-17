@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:record_mp3/record_mp3.dart';
+import 'package:avatar_glow/avatar_glow.dart';
 
 class Record extends StatefulWidget {
   const Record({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class Record extends StatefulWidget {
 
 class _RecordState extends State<Record> {
   String statusText = "";
-  bool isRecord = false;
+  bool isRecording = false;
   RecordStatus _status = RecordStatus.IDEL;
   RecordStatus get status => _status;
   String? recordFilePath = '';
@@ -39,15 +40,15 @@ class _RecordState extends State<Record> {
     }
   }
 
-/*
   Future toggleRecord() async {
-    if (isRecord == true) {
-      await stopRecord();
-    } else {
+    if (_status == RecordStatus.IDEL) {
+      isRecording = true;
       await startRecord();
+    } else {
+      isRecording = false;
+      await stopRecord();
     }
   }
-*/
 
   Future playRecord() async {
     if (recordFilePath != null &&
@@ -72,78 +73,53 @@ class _RecordState extends State<Record> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Example App'),
-        centerTitle: true,
-      ),
-      body: Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-              child: GestureDetector(
-                child: Container(
-                  height: 48.0,
-                  decoration: BoxDecoration(color: Colors.red.shade300),
-                  child: const Center(
-                    child: Text(
-                      'Start',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+        appBar: AppBar(
+          title: const Text('Example App'),
+          centerTitle: true,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: AvatarGlow(
+          animate: isRecording,
+          glowColor: Theme.of(context).primaryColor,
+          endRadius: 80.0,
+          duration: const Duration(milliseconds: 1500),
+          repeatPauseDuration: const Duration(milliseconds: 100),
+          repeat: true,
+          child: FloatingActionButton(
+            onPressed: () {
+              setState(() {});
+              toggleRecord();
+            },
+            child: Icon(isRecording ? Icons.stop : Icons.mic),
+          ),
+        ),
+        body: Container(
+          width: double.infinity,
+          margin: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                style: ButtonStyle(
+                  foregroundColor: MaterialStateProperty.all(Colors.white),
+                  elevation: MaterialStateProperty.all(5),
+                  padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
                 ),
-                onTap: () async {
-                  setState(() {});
-                  startRecord();
-                },
-              ),
-            ),
-            Expanded(
-              child: GestureDetector(
-                child: Container(
-                  height: 48.0,
-                  decoration: BoxDecoration(color: Colors.blue.shade300),
-                  child: const Center(
-                    child: Text(
-                      'Play',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                onTap: () async {
+                child: const Text("Play"),
+                onPressed: () async {
                   setState(() {});
                   playRecord();
                 },
               ),
-            ),
-            Expanded(
-              child: GestureDetector(
-                child: Container(
-                  height: 48.0,
-                  decoration: BoxDecoration(color: Colors.green.shade300),
-                  child: const Center(
-                    child: Text(
-                      'Stop',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+              Padding(
+                padding: const EdgeInsets.only(top: 40.0),
+                child: Text(
+                  statusText,
+                  style: const TextStyle(color: Colors.red, fontSize: 20),
                 ),
-                onTap: () {
-                  setState(() {});
-                  stopRecord();
-                },
               ),
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 40.0),
-          child: Text(
-            statusText,
-            style: const TextStyle(color: Colors.red, fontSize: 20),
+            ],
           ),
-        ),
-      ]),
-    );
+        ));
   }
 }
